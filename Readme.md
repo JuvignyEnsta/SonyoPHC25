@@ -28,9 +28,16 @@
 
 ### Editeur de Sprite basique
 
-```sprite_editor.py``` est un petit éditeur de sprite en Python qui utilise la bibliothèque `pygame`. Il permet de créer et d'enregistrer des images de sprite
-dont le format est compatible avec le mode graphique 4 du Sonyo PHC 25. En entête de ce fichier, vous trouverez différents paramètres pouvant être modifiés 
-pour adapter l'éditeur à votre palette de couleur ou encore à la taille désirée de vos sprites (qu'on suppose ici avoir tous la même taille).
+```sprite_editor.py``` est un petit éditeur de sprite en Python qui utilise la bibliothèque `pygame`. Il permet de créer et d'enregistrer des images de sprite dont le format est compatible avec le mode graphique 4 du Sonyo PHC 25. 
+
+Pour commencer une nouvelle bibliothèque de sprite, vous pouvez rajouter des options à la ligne de commande afin de  :
+
+- Spécifier le nom du projet : ``--filename=<nom du projet>``
+- Spécifier le nombre de frames par sprite : ``--nbframes=<entier>``
+- Spécifier la taille des sprites : ``--size=<largeur>x<hauteur>``
+- Spécifier la palette du phc 25 à utiliser : ``--palette=[0-3]`` (quatre palettes possibles)
+- Spécifier pour la génération du basic le début de ligne : ``--begline=<entier>``
+
 
 A droite, vous trouverez cinq "boutons" :
 
@@ -63,7 +70,7 @@ La librairie `libsprite` permet de gérer un nombre fixe de sprites sur le PHC 2
 - ``void drawSprts()`` : Dessine tous les sprites actifs à l'écran 
 - ``uchar addSprt(uchar kind, uchar x, uchar y)`` : Rajoute un sprite actif à la liste des sprites actifs
 
-### Organisation mémoire*
+### Organisation mémoire
 
 Chaque sprite dans le tableau des sprites prend quatre octets en mémoire selon l'organisation suivante (User signifie que ce bit n'a pas de rôle dans la bibliothèque et est donc à la disposition de l'utilisateur pour sa propre gestion des données du sprite):
 
