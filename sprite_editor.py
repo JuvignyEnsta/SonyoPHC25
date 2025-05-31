@@ -13,6 +13,7 @@ filename = "sprite"
 NB_FRAMES = 4   # Nombre de frames par sprites
 SPRITE_WIDTH=12 # En nombre de pixels
 SPRITE_HEIGHT=16 # En nombre de pixels
+IND_PALETTE=3
 
 BLACK = (  0,  0,  0)
 RED   = (255,  0,  0)
@@ -21,6 +22,8 @@ GREEN = (  0,255,  0)
 WHITE = (255,255,255)
 CYAN  = (  0,255,255)
 MAGENTA = (255,  0,255)
+LIGHT_MAGENTA = (255, 127, 255)
+LIGHT_GREEN = (127,255,127)
 YELLOW= (255,255,  0)
 ORANGE=(255,165,  0)
 PURPLE=(128,  0,128)
@@ -28,12 +31,18 @@ LIGHT_GREEN=(144,238,144)
 LIGHT_YELLOW=(255,255,127)
 DARK_GREY=(63,63,63)
 # Si on veut changer 
-PALETTE = [BLACK, RED, BLUE, WHITE]
+PALETTES = [
+    [GREEN, YELLOW, BLUE, RED],
+    [WHITE, MAGENTA, CYAN, ORANGE],
+    [GREEN, LIGHT_MAGENTA, LIGHT_YELLOW, LIGHT_GREEN],
+    [BLACK, RED, BLUE, WHITE]    
+]
+PALETTE = PALETTES[IND_PALETTE]
 # Numéro de la première ligne basic générée (incrément de 10 ensuite)
 BEG_LINE = 9000
 
 def sparse_argv(argv):
-    global filename, SPRITE_WIDTH, SPRITE_HEIGHT, NB_FRAMES, BEGLINE
+    global filename, SPRITE_WIDTH, SPRITE_HEIGHT, NB_FRAMES, BEG_LINE, IND_PALETTE, PALETTE
     for a in argv:
         if a.startswith("--") and "=" in a:
             key, value = a.split("=")
@@ -51,10 +60,12 @@ def sparse_argv(argv):
                             elif k == "begline":
                                 BEG_LINE = int(v)
                             elif k == "size":
-                                print (f"value : {v}")
                                 size = v.split("x")
                                 SPRITE_WIDTH  = int(size[0])
                                 SPRITE_HEIGHT = int(size[1])
+                            elif k == "palette":
+                                IND_PALETTE = int(v)
+                                PALETTE = PALETTES[IND_PALETTE]
             elif key == "nbframes":
                 NB_FRAMES = int(value)
             elif key == "size":
@@ -63,10 +74,13 @@ def sparse_argv(argv):
                 SPRITE_HEIGHT = int(size[1])
             elif key == "begline":
                 BEG_LINE = int(value)
+            elif key == "palette":
+                IND_PALETTE = int(value)
+                PALETTE = PALETTES[IND_PALETTE]
             else:
                 raise ValueError("Unknown argument " + key)
         elif a == "--help":
-            print(f"Usage : python3 sprite_editor.py --filename=filename --nbframes=NbFrames --size=widthxheight")
+            print(f"Usage : python3 sprite_editor.py --filename=filename --nbframes=NbFrames --size=widthxheight --palette=[0-3] --begline=lignebasic")
             sys.exit(0)
         elif a.startswith("--"):
             raise ValueError("Argument must be in the form --key=value")
@@ -136,7 +150,7 @@ class MetaSprite:
         self.frame   = 0
         self.surface = [pg.Surface((4*SPRITE_WIDTH, 2*SPRITE_HEIGHT)) for i in range(4)]
         self.zoomed_grid_rect = pg.Rect(70,10,32*SPRITE_WIDTH,16*SPRITE_HEIGHT)
-        self.zoomed_sprite = pg.transform.scale(self.surface[self.frame], (32*SPRITE_WIDTH, 16*SPRITE_HEIGHT))
+        self.update_surface()
     
     def update_surface(self):
         for i in range(NB_FRAMES):
@@ -230,10 +244,10 @@ class EditorSprite:
         self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,160), (200,25)), RED, DARK_GREY, self.clear_frame))
         self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,190), (200,25)), YELLOW, RED, self.clear_sprite))
 
-        self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, BLACK, self.choose_black, True))
-        self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, RED, self.choose_red, True))
-        self.buttons.append(Button(self.font, "   ", pg.Rect((10,70),(50,25)), WHITE, BLUE, self.choose_blue, True))
-        self.buttons.append(Button(self.font, "   ", pg.Rect((10,100),(50,25)), WHITE, WHITE, self.choose_white, True))
+        self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, PALETTE[0], self.choose_black, True))
+        self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, PALETTE[1], self.choose_red, True))
+        self.buttons.append(Button(self.font, "   ", pg.Rect((10,70),(50,25)), WHITE, PALETTE[2], self.choose_blue, True))
+        self.buttons.append(Button(self.font, "   ", pg.Rect((10,100),(50,25)), WHITE, PALETTE[3], self.choose_white, True))
 
         self.buttons.append(Button(self.font, "→", pg.Rect((600, 610),(25,25)), WHITE, BLACK, self.next_sprite))
         self.buttons.append(Button(self.font, "←", pg.Rect((100, 610),(25,25)), WHITE, BLACK, self.prev_sprite))
@@ -293,7 +307,8 @@ class EditorSprite:
                     "# Sprite editor configuration\n"
                     f"nbframes={NB_FRAMES}\n",
                     f"begline={BEG_LINE}\n",
-                    f"size={SPRITE_WIDTH}x{SPRITE_HEIGHT}\n"
+                    f"size={SPRITE_WIDTH}x{SPRITE_HEIGHT}\n",
+                    f"palette={IND_PALETTE}\n"
                 ]
                 f.writelines(lines)
         
