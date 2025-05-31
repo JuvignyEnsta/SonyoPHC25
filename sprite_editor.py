@@ -3,6 +3,7 @@ import pygame as pg
 import numpy as np
 from typing import Callable
 import sys
+import os
 
 filename = "sprite"
 
@@ -32,19 +33,36 @@ PALETTE = [BLACK, RED, BLUE, WHITE]
 BEG_LINE = 9000
 
 def sparse_argv(argv):
-    global filename, SPRITE_WIDTH, SPRITE_HEIGHT, NB_FRAMES
+    global filename, SPRITE_WIDTH, SPRITE_HEIGHT, NB_FRAMES, BEGLINE
     for a in argv:
         if a.startswith("--") and "=" in a:
             key, value = a.split("=")
             key = key[2:]
             if key == "filename":
                 filename = value
+                if os.path.exists(filename+".cfg"):
+                    with open(filename+".cfg", "r") as f:
+                        for line in f:
+                            if line.startswith("#"):
+                                continue
+                            k, v = line.strip().split("=")
+                            if k == "nbframes":
+                                NB_FRAMES=int(v)
+                            elif k == "begline":
+                                BEG_LINE = int(v)
+                            elif k == "size":
+                                print (f"value : {v}")
+                                size = v.split("x")
+                                SPRITE_WIDTH  = int(size[0])
+                                SPRITE_HEIGHT = int(size[1])
             elif key == "nbframes":
                 NB_FRAMES = int(value)
             elif key == "size":
                 size = value.split("x")
                 SPRITE_WIDTH  = int(size[0])
                 SPRITE_HEIGHT = int(size[1])
+            elif key == "begline":
+                BEG_LINE = int(value)
             else:
                 raise ValueError("Unknown argument " + key)
         elif a == "--help":
@@ -268,6 +286,16 @@ class EditorSprite:
             f.write((len(self.sprites)).to_bytes(8,signed=False))
             for sprite in self.sprites:
                 np.save(f, sprite.sprites)
+                
+        if not os.path.exists(filename + ".cfg"):
+            with open(filename + ".cfg", 'w') as f:
+                lines = [
+                    "# Sprite editor configuration\n"
+                    f"nbframes={NB_FRAMES}\n",
+                    f"begline={BEG_LINE}\n",
+                    f"size={SPRITE_WIDTH}x{SPRITE_HEIGHT}\n"
+                ]
+                f.writelines(lines)
         
     def generage_frames(self):
         self.sprites[self.current_sprite].generate_frames()

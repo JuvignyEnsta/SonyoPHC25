@@ -96,7 +96,7 @@ Chaque sprite dans le tableau des sprites prend quatre octets en mémoire selon 
 
 Le choix de quatre octets pour décrire un sprite vient du fait qu'il est plus facile de trouver rapidement la position du ième sprite dans la table que si on avait utiliser trois octets, permettant un traitement plus rapide des sprites.
 
-- ## Histoire
+## Histoire
 
 **Année 2194**. L'humanité vient de fonder une nouvelle colonie sur une planète extra-solaire, à plusieurs années-lumière de la Terre.
 Malheureusement, après que la colonie ait trouvé un gisement d'un minerai très rare servant aux voyages interstellaires, le puissant 
