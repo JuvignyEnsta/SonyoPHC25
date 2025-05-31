@@ -2,8 +2,9 @@
 import pygame as pg
 import numpy as np
 from typing import Callable
+import sys
 
-filename = "sprite.dat"
+filename = "sprite"
 
 # Le nombre de frames a été choisi à 4 car le Sanyo PCH 25 en mode 4 contient 4 pixels par octets (donc 4 couleurs)
 # Donc pour avoir un décalage des sprites pixel par pixel, on est obligé d'avoir quatre fois un décalage d'un pixel
@@ -30,6 +31,35 @@ PALETTE = [BLACK, RED, BLUE, WHITE]
 # Numéro de la première ligne basic générée (incrément de 10 ensuite)
 BEG_LINE = 9000
 
+def sparse_argv(argv):
+    global filename, SPRITE_WIDTH, SPRITE_HEIGHT, NB_FRAMES
+    for a in argv:
+        if a.startswith("--") and "=" in a:
+            key, value = a.split("=")
+            key = key[2:]
+            if key == "filename":
+                filename = value
+            elif key == "nbframes":
+                NB_FRAMES = int(value)
+            elif key == "size":
+                size = value.split("x")
+                SPRITE_WIDTH  = int(size[0])
+                SPRITE_HEIGHT = int(size[1])
+            else:
+                raise ValueError("Unknown argument " + key)
+        elif a == "--help":
+            print(f"Usage : python3 sprite_editor.py --filename=filename --nbframes=NbFrames --size=widthxheight")
+            sys.exit(0)
+        elif a.startswith("--"):
+            raise ValueError("Argument must be in the form --key=value")
+        else:
+            raise ValueError("Argument must be in the form --key=value")
+    print (f"filename : {filename}, number of frames : {NB_FRAMES}, Size of sprites : {SPRITE_WIDTH}x{SPRITE_HEIGHT}")
+
+if len(sys.argv) > 1 :
+    sparse_argv(sys.argv[1:])
+
+
 class Button:
     """
     Un bouton avec un texte et une fonction à appeler lorsqu'il est cliqué.
@@ -42,8 +72,9 @@ class Button:
         self.surface.blit(self.text, pos)
         self.rect = rect
         self.on_click = on_click
-        self.is_pointed = False
-        self.is_clicked = False
+        self.is_pointed  = False
+        self.is_clicked  = False
+        self.is_released = True
         self.draw_border = draw_border
 
     def draw(self, screen : pg.Surface):
@@ -64,15 +95,18 @@ class Button:
                 else :
                     self.is_pointed = False
                     self.is_clicked = False
+                    self.is_released = True
             if event.type == pg.MOUSEBUTTONDOWN :
                 mouse_pos = pg.mouse.get_pos()
-                if self.rect.collidepoint(mouse_pos) :
-                    self.is_clicked = True
+                if self.rect.collidepoint(mouse_pos) and self.is_released:
+                    self.is_clicked  = True
+                    self.is_released = False
             if event.type == pg.MOUSEBUTTONUP :
                 mouse_pos = pg.mouse.get_pos()
                 if self.rect.collidepoint(mouse_pos) :
-                    self.is_clicked = False
-            if self.is_clicked:
+                    self.is_released = True
+            if self.is_clicked and self.is_released:
+                self.is_clicked = False
                 self.on_click()
 
 class MetaSprite:
@@ -136,6 +170,14 @@ class MetaSprite:
             self.sprites[i] = np.roll(self.sprites[i-1], shift=1, axis=0)
         self.update_surface()
         
+    def clear_frame(self):
+        self.sprites[self.frame,:,:] = 0
+        self.update_surface()
+        
+    def clear_sprite(self):
+        self.sprites[:,:,:] = 0
+        self.update_surface()        
+        
     def generate_data(self, line : int):
         s = ""
         for f in range(NB_FRAMES):
@@ -167,6 +209,9 @@ class EditorSprite:
         self.buttons.append(Button(self.font, "Load sprites", pg.Rect((800,70), (200,25)), BLUE, DARK_GREY, self.load_sprite))
         self.buttons.append(Button(self.font, "Save sprites", pg.Rect((800,100), (200,25)), YELLOW, DARK_GREY, self.save_sprites))
         self.buttons.append(Button(self.font, "  Gen. Data ", pg.Rect((800,130), (200,25)), GREEN, DARK_GREY, self.generate_data))
+        self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,160), (200,25)), RED, DARK_GREY, self.clear_frame))
+        self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,190), (200,25)), YELLOW, RED, self.clear_sprite))
+
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, BLACK, self.choose_black, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, RED, self.choose_red, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,70),(50,25)), WHITE, BLUE, self.choose_blue, True))
@@ -182,7 +227,6 @@ class EditorSprite:
     def new_sprite(self):
         self.sprites.append(MetaSprite())
         self.current_sprite = len(self.sprites)-1
-        print("New sprite created")
         
     def next_sprite(self):
         if self.current_sprite < len(self.sprites)-1:
@@ -202,8 +246,15 @@ class EditorSprite:
     def prev_frame(self):
         self.sprites[self.current_sprite].previous_frame()
         
+    def clear_frame(self):
+        self.sprites[self.current_sprite].clear_frame()
+        
+    def clear_sprite(self):
+        self.sprites[self.current_sprite].clear_sprite()
+        
     def load_sprite(self):
-        with open(filename, 'rb') as f:
+        self.sprites = []
+        with open(filename + ".dat", 'rb') as f:
             l = int.from_bytes(f.read(8), signed=False)
             for i in range(l):
                 s = MetaSprite()
@@ -213,7 +264,7 @@ class EditorSprite:
         self.current_sprite = 0
     
     def save_sprites(self):
-        with open(filename, 'wb') as f:
+        with open(filename + ".dat", 'wb') as f:
             f.write((len(self.sprites)).to_bytes(8,signed=False))
             for sprite in self.sprites:
                 np.save(f, sprite.sprites)
@@ -223,7 +274,7 @@ class EditorSprite:
 
     def generate_data(self):
         line = BEG_LINE
-        with open("sprites.bas", "w") as f:
+        with open(filename + ".bas", "w") as f:
             for sprite in self.sprites:
                 bas, line = sprite.generate_data(line)
                 f.write(bas)
@@ -269,8 +320,11 @@ class EditorSprite:
             for i,s in enumerate(self.sprites):
                 s.sprite_display(screen, (x,y))
                 if i==self.current_sprite:
-                    pg.draw.rect(screen, (255,0,0), (x-2,y,4*SPRITE_WIDTH+4,(2*SPRITE_HEIGHT+8)*NB_FRAMES+8), 2)
+                    pg.draw.rect(screen, (255,0,0), (x-2,y-4,4*SPRITE_WIDTH+4,(2*SPRITE_HEIGHT+8)*NB_FRAMES+8), 2)
                 x += 4*SPRITE_WIDTH + 4
+                if x > screen.get_width():
+                    y += (2*SPRITE_HEIGHT+8)*NB_FRAMES + 8
+                    x = 10
 
     def handle_events(self, events : list[pg.event.Event]):
         for b in self.buttons:
@@ -283,7 +337,6 @@ class EditorSprite:
                     y = (mouse_pos[1]-10)//16
                     if self.sprites[self.current_sprite].zoomed_grid_rect.collidepoint(mouse_pos) :
                         self.sprites[self.current_sprite].set_point(self.index_current_color, (x,y))
-
 
 pg.init()
 screen = pg.display.set_mode((1200, 1024))
