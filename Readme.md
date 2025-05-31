@@ -77,11 +77,11 @@ pour adapter l'éditeur à votre palette de couleur ou encore à la taille dési
 
 A droite, vous trouverez cinq "boutons" :
 
-    - New sprite vous permet en cliquant dessus de créer un nouveau sprite. Chaque sprite est composé de plusieurs frames (quatre pour mon besoin)
-    - Gen. Frames permet de répliquer l'image du premier frame aux autres frames du sprite en décalant d'un pixel sur la droite l'image (afin d'avoir un déplacement horizontal fluide dans le jeu).
-    - Load sprites vous permet de charger votre dernière session de travail (nom du fichier fixé dans le script mais qu'on peut bien sûr modifié)
-    - Save sprites vous permet de sauvegarder votre session de travail
-    - Gen. Data vous permet de sauvegarder vos sprites sous forme de listing basique à l'aide de l'instruction DATA. 
+- `New sprite` vous permet en cliquant dessus de créer un nouveau sprite. Chaque sprite est composé de plusieurs frames (quatre pour mon besoin)
+- `Gen. Frames` permet de répliquer l'image du premier frame aux autres frames du sprite en décalant d'un pixel sur la droite l'image (afin d'avoir un déplacement horizontal fluide dans le jeu).
+- `Load sprites` vous permet de charger votre dernière session de travail (nom du fichier fixé dans le script mais qu'on peut bien sûr modifié)
+- `Save sprites` vous permet de sauvegarder votre session de travail
+- `Gen. Data` vous permet de sauvegarder vos sprites sous forme de listing basique à l'aide de l'instruction DATA. 
 
 En bas, on trouve différents boutons :
    - Les flèches aux extrémités permettent de passer d'un sprite (et ses frames) au sprite précédent ou suivant.

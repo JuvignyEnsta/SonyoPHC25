@@ -24,6 +24,7 @@ ORANGE=(255,165,  0)
 PURPLE=(128,  0,128)
 LIGHT_GREEN=(144,238,144)
 LIGHT_YELLOW=(255,255,127)
+DARK_GREY=(63,63,63)
 # Si on veut changer 
 PALETTE = [BLACK, RED, BLUE, WHITE]
 # Numéro de la première ligne basic générée (incrément de 10 ensuite)
@@ -161,11 +162,11 @@ class EditorSprite:
         self.max_counter = 80
         self.index_current_color = 0
         self.buttons = []
-        self.buttons.append(Button(self.font, "New sprite", pg.Rect((800,10),(200,25)), GREEN, BLACK, self.new_sprite))
-        self.buttons.append(Button(self.font, "Gen. frames", pg.Rect((800,40), (200,25)), CYAN, BLACK, self.generage_frames))
-        self.buttons.append(Button(self.font, "Load sprites", pg.Rect((800,70), (200,25)), BLUE, BLACK, self.load_sprite))
-        self.buttons.append(Button(self.font, "Save sprites", pg.Rect((800,100), (200,25)), YELLOW, BLACK, self.save_sprites))
-        self.buttons.append(Button(self.font, "Gen. Data", pg.Rect((800,130), (200,25)), GREEN, BLACK, self.generate_data))
+        self.buttons.append(Button(self.font, " New sprite ", pg.Rect((800,10),(200,25)), GREEN, DARK_GREY, self.new_sprite))
+        self.buttons.append(Button(self.font, "Gen. frames ", pg.Rect((800,40), (200,25)), CYAN, DARK_GREY, self.generage_frames))
+        self.buttons.append(Button(self.font, "Load sprites", pg.Rect((800,70), (200,25)), BLUE, DARK_GREY, self.load_sprite))
+        self.buttons.append(Button(self.font, "Save sprites", pg.Rect((800,100), (200,25)), YELLOW, DARK_GREY, self.save_sprites))
+        self.buttons.append(Button(self.font, "  Gen. Data ", pg.Rect((800,130), (200,25)), GREEN, DARK_GREY, self.generate_data))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, BLACK, self.choose_black, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, RED, self.choose_red, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,70),(50,25)), WHITE, BLUE, self.choose_blue, True))
