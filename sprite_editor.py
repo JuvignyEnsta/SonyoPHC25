@@ -108,11 +108,11 @@ class MetaSprite:
         for i in range(16, 16*SPRITE_HEIGHT, 16):
             pg.draw.line(screen, WHITE, (70,i+10), (32*SPRITE_WIDTH+70,i+10), 1)
     
-    def sprite_display(self,screen):
-        y = 400
+    def sprite_display(self,screen, crd = (800,400)):
+        y = crd[1]
         for s in self.surface:
-            screen.blit(s, (800, y))
-            y += 40
+            screen.blit(s, (crd[0], y))
+            y += (2*SPRITE_HEIGHT+8)
         
     def display_current_frame(self, screen):
         screen.blit(self.surface[self.frame], (150, 400))
@@ -263,6 +263,14 @@ class EditorSprite:
                 if self.counter_frame == 0:
                     self.sprites[self.current_sprite].next_frame()
                     self.counter_frame = self.max_counter
+            # Affichage des sprites en bas de l'écran :
+            x = 10
+            y = 700
+            for i,s in enumerate(self.sprites):
+                s.sprite_display(screen, (x,y))
+                if i==self.current_sprite:
+                    pg.draw.rect(screen, (255,0,0), (x-2,y,4*SPRITE_WIDTH+4,(2*SPRITE_HEIGHT+8)*NB_FRAMES+8), 2)
+                x += 4*SPRITE_WIDTH + 4
 
     def handle_events(self, events : list[pg.event.Event]):
         for b in self.buttons:
