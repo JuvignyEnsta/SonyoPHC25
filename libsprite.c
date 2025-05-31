@@ -53,7 +53,12 @@ struct SpriteTableStruct
 
 void initSprtTab(void) __z88dk_fastcall
 {
-    memset(&spriteTab, 0, sizeof(spriteTab));
+    for (int i = 0; i < NB_OF_SPRITES; i++)
+    {
+        spriteTab.sprites[i].id     = 0;
+        spriteTab.sprites[i].coords = 0;
+        spriteTab.sprites[i].user   = 0;
+    }
 }
 
 #define IS_ACTIVE(i) spriteTab.sprites[i].id & 128 != 0

@@ -9,30 +9,32 @@ Object  file libsprite.o at $0000: Z80RMF18
   Section IGNORE: 0 bytes
   Section code_crt_init: 0 bytes
   Section code_home: 0 bytes
-  Section code_compiler: 361 bytes
-    C $0000: 21 00 00 06 28 36 00 23 10 FB C9 5D 01 00 00 CB
-    C $0010: 23 CB 23 6B 26 00 09 7E 0F 30 2C 6B 26 00 09 23
-    C $0020: 4E 23 46 CB 38 CB 19 CB 38 CB 19 CB 38 CB 19 21
-    C $0030: 00 60 09 0E 00 79 D6 10 D0 AF 77 23 77 23 36 00
-    C $0040: 11 1E 00 19 0C 18 EE C9 2E 00 7D D6 0A D0 E5 CD
-    C $0050: 00 00 E1 2C 18 F4 DD E5 DD 21 00 00 DD 39 F5 F5
-    C $0060: 0E 00 79 FE 0A D2 00 00 87 87 5F 21 00 00 16 00
-    C $0070: 19 7E 0F D2 00 00 21 00 00 16 00 19 7E E6 0F 47
-    C $0080: 21 00 00 16 00 19 23 7E DD 77 FC 23 7E DD 77 FD
-    C $0090: DD 5E FC DD 6E FD CB 3D CB 1B CB 3D CB 1B CB 3D
-    C $00A0: CB 1B 7D C6 60 57 D5 58 16 00 6B 62 29 19 29 29
-    C $00B0: 29 29 29 29 D1 7D C6 00 DD 77 FE 7C CE 00 DD 77
-    C $00C0: FF DD 7E FC E6 03 6F 26 00 D5 5D 54 29 19 29 29
-    C $00D0: 29 29 D1 7D DD 86 FE 6F 7C DD 8E FF 67 DD 36 FF
-    C $00E0: 00 DD 7E FF D6 10 30 1D 1A 46 B0 12 13 23 1A 46
-    C $00F0: B0 12 13 23 1A 46 B0 12 7B C6 1E 5F 30 01 14 23
-    C $0100: DD 34 FF 18 DC 0C C3 00 00 DD F9 DD E1 C9 DD E5
-    C $0110: DD 21 00 00 DD 39 F5 0E 00 79 87 87 5F 79 D6 0A
-    C $0120: 30 0E 21 00 00 16 00 19 7E E6 01 28 03 0C 18 E9
-    C $0130: 79 D6 0A 20 04 2E FF 18 2B 21 00 00 16 00 19 DD
-    C $0140: 7E 04 CB FF 77 21 00 00 16 00 19 23 E3 DD 6E 06
-    C $0150: 26 00 29 29 29 29 29 DD 5E 05 16 00 19 EB E1 E5
-    C $0160: 73 23 72 69 DD F9 DD E1 C9
+  Section code_compiler: 387 bytes
+    C $0000: 01 00 00 79 D6 0A D0 69 60 29 29 EB 21 00 00 19
+    C $0010: 36 00 21 00 00 19 5D 54 13 AF 12 13 12 23 23 23
+    C $0020: 36 00 03 18 DE 5D 01 00 00 CB 23 CB 23 6B 26 00
+    C $0030: 09 7E 0F 30 2C 6B 26 00 09 23 4E 23 46 CB 38 CB
+    C $0040: 19 CB 38 CB 19 CB 38 CB 19 21 00 60 09 0E 00 79
+    C $0050: D6 10 D0 AF 77 23 77 23 36 00 11 1E 00 19 0C 18
+    C $0060: EE C9 2E 00 7D D6 0A D0 E5 CD 00 00 E1 2C 18 F4
+    C $0070: DD E5 DD 21 00 00 DD 39 F5 F5 0E 00 79 FE 0A D2
+    C $0080: 00 00 87 87 5F 21 00 00 16 00 19 7E 0F D2 00 00
+    C $0090: 21 00 00 16 00 19 7E E6 0F 47 21 00 00 16 00 19
+    C $00A0: 23 7E DD 77 FC 23 7E DD 77 FD DD 5E FC DD 6E FD
+    C $00B0: CB 3D CB 1B CB 3D CB 1B CB 3D CB 1B 7D C6 60 57
+    C $00C0: D5 58 16 00 6B 62 29 19 29 29 29 29 29 29 D1 7D
+    C $00D0: C6 00 DD 77 FE 7C CE 00 DD 77 FF DD 7E FC E6 03
+    C $00E0: 6F 26 00 D5 5D 54 29 19 29 29 29 29 D1 7D DD 86
+    C $00F0: FE 6F 7C DD 8E FF 67 DD 36 FF 00 DD 7E FF D6 10
+    C $0100: 30 1D 1A 46 B0 12 13 23 1A 46 B0 12 13 23 1A 46
+    C $0110: B0 12 7B C6 1E 5F 30 01 14 23 DD 34 FF 18 DC 0C
+    C $0120: C3 00 00 DD F9 DD E1 C9 DD E5 DD 21 00 00 DD 39
+    C $0130: F5 0E 00 79 87 87 5F 79 D6 0A 30 0E 21 00 00 16
+    C $0140: 00 19 7E E6 01 28 03 0C 18 E9 79 D6 0A 20 04 2E
+    C $0150: FF 18 2B 21 00 00 16 00 19 DD 7E 04 CB FF 77 21
+    C $0160: 00 00 16 00 19 23 E3 DD 6E 06 26 00 29 29 29 29
+    C $0170: 29 DD 5E 05 16 00 19 EB E1 E5 73 23 72 69 DD F9
+    C $0180: DD E1 C9
   Section data_compiler: 1152 bytes
     C $0000: 03 00 00 03 00 00 0F C0 00 0F C0 00 0E C0 00 38
     C $0010: B0 00 30 B0 00 3C F0 00 FF FC 00 2F E0 00 1B 90
@@ -108,9 +110,9 @@ Object  file libsprite.o at $0000: Z80RMF18
     C $0470: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
   Symbols:
     G A $0000: _spriteTab (section bss_compiler) (file libsprite.c:356)
-    G A $010E: _addSprt (section code_compiler) (file libsprite.c:587)
-    G A $0056: _drawSprts (section code_compiler) (file libsprite.c:461)
+    G A $0128: _addSprt (section code_compiler) (file libsprite.c:608)
+    G A $0070: _drawSprts (section code_compiler) (file libsprite.c:482)
     G A $0000: _initSprtTab (section code_compiler) (file libsprite.c:390)
-    G A $000B: _undrawSprt (section code_compiler) (file libsprite.c:401)
-    G A $0048: _undrawSprts (section code_compiler) (file libsprite.c:447)
-    G A $0000: _sprites (section data_compiler) (file libsprite.c:649)
+    G A $0025: _undrawSprt (section code_compiler) (file libsprite.c:422)
+    G A $0062: _undrawSprts (section code_compiler) (file libsprite.c:468)
+    G A $0000: _sprites (section data_compiler) (file libsprite.c:670)

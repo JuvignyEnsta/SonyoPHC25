@@ -388,13 +388,34 @@ ENDIF
 ; Function initSprtTab
 ; ---------------------------------
 _initSprtTab:
-	ld	hl,_spriteTab
-	ld	b,0x28
+	ld	bc,0x0000
 l_initSprtTab_00103:
+	ld	a, c
+	sub	a,0x0a
+	ret	NC
+	ld	l, c
+	ld	h, b
+	add	hl, hl
+	add	hl, hl
+	ex	de,hl
+	ld	hl,_spriteTab
+	add	hl, de
 	ld	(hl),0x00
+	ld	hl,_spriteTab
+	add	hl, de
+	ld	e, l
+	ld	d, h
+	inc	de
+	xor	a, a
+	ld	(de), a
+	inc	de
+	ld	(de), a
 	inc	hl
-	djnz	l_initSprtTab_00103
-	ret
+	inc	hl
+	inc	hl
+	ld	(hl),0x00
+	inc	bc
+	jr	l_initSprtTab_00103
 ;	---------------------------------
 ; Function undrawSprt
 ; ---------------------------------
