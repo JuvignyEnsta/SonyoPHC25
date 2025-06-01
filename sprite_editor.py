@@ -237,8 +237,8 @@ class MetaSprite:
                         value += 8*mask_sprite[f][ix+4,iy] + 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
                         value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]
                     else:
-                        value += mask_sprite[f][ix+3,iy] + 2*mask_sprite[f][ix+2,iy]
-                        value += 4*mask_sprite[f][ix+1,iy] + 8*mask_sprite[f][ix+0,iy]                        
+                        value += 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
+                        value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]                        
                     s += f"{value}" + ("," if ix < SPRITE_WIDTH-8 else "")
                 s += "," if iy < SPRITE_HEIGHT-1 else ""
             s += "\n"
@@ -276,8 +276,8 @@ class MetaSprite:
                         value += 8*mask_sprite[f][ix+4,iy] + 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
                         value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]
                     else:
-                        value += mask_sprite[f][ix+3,iy] + 2*mask_sprite[f][ix+2,iy]
-                        value += 4*mask_sprite[f][ix+1,iy] + 8*mask_sprite[f][ix+0,iy]                        
+                        value += 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
+                        value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]                        
                     s += f"${hex(value)[2:]:2}"
                     if ix < SPRITE_WIDTH-8:
                         s += ", "
