@@ -223,7 +223,71 @@ class MetaSprite:
             s += "\n"
             line += 10
         return s,line
+
+    def generate_mask_data(self, line : int):
+        s = ""
+        mask_sprite = (self.sprites[:,:,:] != 0).astype(np.int8)
+        for f in range(NB_FRAMES):
+            s += f"{line} DATA "
+            for iy in range(SPRITE_HEIGHT):
+                for ix in range(0,SPRITE_WIDTH,8):
+                    value = 0
+                    if ix < SPRITE_WIDTH-7:
+                        value = mask_sprite[f][ix+7,iy] + 2*mask_sprite[f][ix+6,iy] + 4*mask_sprite[f][ix+5,iy]
+                        value += 8*mask_sprite[f][ix+4,iy] + 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
+                        value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]
+                    else:
+                        value += mask_sprite[f][ix+3,iy] + 2*mask_sprite[f][ix+2,iy]
+                        value += 4*mask_sprite[f][ix+1,iy] + 8*mask_sprite[f][ix+0,iy]                        
+                    s += f"{value}" + ("," if ix < SPRITE_WIDTH-8 else "")
+                s += "," if iy < SPRITE_HEIGHT-1 else ""
+            s += "\n"
+            line += 10
+        return s,line
+
+    
+    def generate_asm(self):
+        s = ""
+        for f in range(NB_FRAMES):
+            s += f"\tdb "
+            for iy in range(SPRITE_HEIGHT):
+                for ix in range(0,SPRITE_WIDTH,4):
+                    value = self.sprites[f][ix+3,iy] + 4*self.sprites[f][ix+2,iy] + 16*self.sprites[f][ix+1,iy]
+                    value += 64*self.sprites[f][ix+0,iy]
+                    s += f"${hex(value)[2:]:2}"
+                    if ix < SPRITE_WIDTH-4:
+                        s += ", "
+                if iy < SPRITE_HEIGHT-1:
+                    s += ', '
+                else:
+                    s += '\n'
+        return s
+    
+    def generate_mask_asm(self):
+        s = ""
+        mask_sprite = (self.sprites[:,:,:] != 0).astype(np.int8)
+        for f in range(NB_FRAMES):
+            s += f"\tdb "
+            for iy in range(SPRITE_HEIGHT):
+                for ix in range(0,SPRITE_WIDTH,8):
+                    value = 0
+                    if ix < SPRITE_WIDTH-7:
+                        value = mask_sprite[f][ix+7,iy] + 2*mask_sprite[f][ix+6,iy] + 4*mask_sprite[f][ix+5,iy]
+                        value += 8*mask_sprite[f][ix+4,iy] + 16*mask_sprite[f][ix+3,iy] + 32*mask_sprite[f][ix+2,iy]
+                        value += 64*mask_sprite[f][ix+1,iy] + 128*mask_sprite[f][ix+0,iy]
+                    else:
+                        value += mask_sprite[f][ix+3,iy] + 2*mask_sprite[f][ix+2,iy]
+                        value += 4*mask_sprite[f][ix+1,iy] + 8*mask_sprite[f][ix+0,iy]                        
+                    s += f"${hex(value)[2:]:2}"
+                    if ix < SPRITE_WIDTH-8:
+                        s += ", "
+                if iy < SPRITE_HEIGHT-1:
+                    s += ', '
+                else:
+                    s += '\n'
+        return s
         
+            
 class EditorSprite:
     def __init__(self):
         pg.font.init()
@@ -241,8 +305,9 @@ class EditorSprite:
         self.buttons.append(Button(self.font, "Load sprites", pg.Rect((800,70), (200,25)), BLUE, DARK_GREY, self.load_sprite))
         self.buttons.append(Button(self.font, "Save sprites", pg.Rect((800,100), (200,25)), YELLOW, DARK_GREY, self.save_sprites))
         self.buttons.append(Button(self.font, "  Gen. Data ", pg.Rect((800,130), (200,25)), GREEN, DARK_GREY, self.generate_data))
-        self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,160), (200,25)), RED, DARK_GREY, self.clear_frame))
-        self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,190), (200,25)), YELLOW, RED, self.clear_sprite))
+        self.buttons.append(Button(self.font, "  Gen. asm " , pg.Rect((800,160), (200,25)), LIGHT_GREEN, DARK_GREY, self.generate_asm))
+        self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,190), (200,25)), RED, DARK_GREY, self.clear_frame))
+        self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,220), (200,25)), YELLOW, RED, self.clear_sprite))
 
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, PALETTE[0], self.choose_black, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, PALETTE[1], self.choose_red, True))
@@ -321,7 +386,22 @@ class EditorSprite:
             for sprite in self.sprites:
                 bas, line = sprite.generate_data(line)
                 f.write(bas)
-    
+        line += 1000
+        with open(filename + "_mask.bas", "w") as f:
+            for sprite in self.sprites:
+                bas, line = sprite.generate_mask_data(line)
+                f.write(bas)
+                
+    def generate_asm(self):
+        with open(filename + ".asm", "w") as f:
+            for sprite in self.sprites:
+                asm = sprite.generate_asm()
+                f.write(asm)
+        with open(filename + "_mask.asm", "w") as f:
+            for sprite in self.sprites:
+                asm = sprite.generate_mask_asm()
+                f.write(asm)
+            
     def play_animation(self):
         self.counter_frame = self.max_counter
     
