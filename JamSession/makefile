@@ -1,13 +1,22 @@
 # Makefile pour compiler le code pour PHC 25
-CC = zcc 
-CFLAGS = +z80 -mz80 -O2 -nostdlib --no-crt --code-loc0xe000 --data-loc0xB000 -sub-type=basic -c
-all: libsprite.o libsprite.s libsprite.dat
-libsprite.o: libsprite.c
-	$(CC) $(CFLAGS) -o $@ $<
-libsprite.s: libsprite.c
-	$(CC) $(CFLAGS) -S -o $@ $<
-libsprite.dat: libsprite.o 
-	z88dk.z88dk-z80nm -c $< > $@
+AS := sjasmplus 
+
+SRCS := raptalien.asm
+DEPS := macros.asm fonte.asm sprite8x16.asm sprite16x16.asm
+
+TARGET_NAME := raptalien
+TARGET      := $(TARGET_NAME).rom
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS) $(DEPS)
+	$(AS) --raw=$(TARGET) --sym=$(TARGET_NAME).sym --lst=$(TARGET_NAME).lst $(SRCS) 
+
 clean:
-	rm -f *.o *.s *.dat
+	rm -fr $(OBJS) $(TARGET) $(TARGET_NAME).sym $(TARGET_NAME).lst rapt.phc
+
+phc: $(TARGET)
+	gcc -Wall -O2 -o bin_to_phc main.c
+	./bin_to_phc RAPT $(TARGET) rapt.phc 
+
 .PHONY: all clean

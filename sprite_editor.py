@@ -13,7 +13,7 @@ filename = "sprite"
 NB_FRAMES = 4   # Nombre de frames par sprites
 SPRITE_WIDTH=12 # En nombre de pixels
 SPRITE_HEIGHT=16 # En nombre de pixels
-IND_PALETTE=3
+IND_PALETTE=0
 
 BLACK = (  0,  0,  0)
 RED   = (255,  0,  0)
@@ -263,6 +263,16 @@ class MetaSprite:
                     s += '\n'
         return s
     
+    def generate_bin(self):
+        l = []
+        for f in range(NB_FRAMES):
+            for iy in range(SPRITE_HEIGHT):
+                for ix in range(0,SPRITE_WIDTH,4):
+                    value = self.sprites[f][ix+3,iy] + 4*self.sprites[f][ix+2,iy] + 16*self.sprites[f][ix+1,iy]
+                    value += 64*self.sprites[f][ix+0,iy]
+                    l.append(value)
+        return bytearray(l)
+    
     def generate_mask_asm(self):
         s = ""
         mask_sprite = (self.sprites[:,:,:] != 0).astype(np.int8)
@@ -306,8 +316,9 @@ class EditorSprite:
         self.buttons.append(Button(self.font, "Save sprites", pg.Rect((800,100), (200,25)), YELLOW, DARK_GREY, self.save_sprites))
         self.buttons.append(Button(self.font, "  Gen. Data ", pg.Rect((800,130), (200,25)), GREEN, DARK_GREY, self.generate_data))
         self.buttons.append(Button(self.font, "  Gen. asm " , pg.Rect((800,160), (200,25)), LIGHT_GREEN, DARK_GREY, self.generate_asm))
-        self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,190), (200,25)), RED, DARK_GREY, self.clear_frame))
-        self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,220), (200,25)), YELLOW, RED, self.clear_sprite))
+        self.buttons.append(Button(self.font, "  Gen. bin " , pg.Rect((800,190), (200,25)), LIGHT_GREEN, DARK_GREY, self.generate_bin))
+        self.buttons.append(Button(self.font, " Clear frame", pg.Rect((800,220), (200,25)), RED, DARK_GREY, self.clear_frame))
+        self.buttons.append(Button(self.font, "Clear sprite", pg.Rect((800,250), (200,25)), YELLOW, RED, self.clear_sprite))
 
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,10),(50,25)), WHITE, PALETTE[0], self.choose_black, True))
         self.buttons.append(Button(self.font, "   ", pg.Rect((10,40),(50,25)), WHITE, PALETTE[1], self.choose_red, True))
@@ -401,6 +412,12 @@ class EditorSprite:
             for sprite in self.sprites:
                 asm = sprite.generate_mask_asm()
                 f.write(asm)
+                
+    def generate_bin(self):
+        with open(filename + ".bin", "wb") as f:
+            for sprite in self.sprites:
+                bin_data = sprite.generate_bin()
+                f.write(bin_data)
             
     def play_animation(self):
         self.counter_frame = self.max_counter
