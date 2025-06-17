@@ -2,7 +2,7 @@
 AS := sjasmplus 
 
 SRCS := raptalien.asm
-DEPS := macros.asm fonte.asm sprite8x16.asm sprite16x16.asm
+DEPS := macros.asm alien.asm dzx0_standard.asm missiles.asm sprite.asm vaisseau.asm font.zx0 mask_sprite.zx0 sprite16x16.zx0
 
 TARGET_NAME := raptalien
 TARGET      := $(TARGET_NAME).rom

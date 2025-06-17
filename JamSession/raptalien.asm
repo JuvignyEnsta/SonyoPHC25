@@ -1,8 +1,5 @@
 	include "macros.asm"
-SCREEN_ADDR:	EQU	0x6000
-SCORE_X: 	    EQU 104
-SCORE_MSG_Y:    EQU 4
-SCORE_MSG_ADDR: EQU SCREEN_ADDR + (SCORE_X>>2)+32*SCORE_MSG_Y
+	include "constantes.asm"
 
 	ORG 0XC009
 start:
@@ -163,7 +160,7 @@ cur_pos:
 ; =============================================================================
 ; == Fonction pour afficher un caractère à l'écran.                          ==
 ; == En entrée : A = caractère à afficher (entre 0 et 255)                   ==
-; ==            HL = adresse de l'écran où afficher le caractère             ==
+; ==            IX = adresse de l'écran où afficher le caractère             ==
 ; =============================================================================
 put_char:
 	PUSH IX
@@ -214,34 +211,20 @@ cls:
 ; == Fonction pour attendre la fin du balayage vidéo                         ==
 ; =============================================================================
 wait_vsync:
+.wait1:
 	IN A, (0x40)
 	AND   0x10
-	JR Z, .end
-	IN A, (0x40)
-	AND   0x10
-	JR NZ, wait_vsync
+;	JR Z, .end
+;	IN A, (0x40)
+;	AND   0x10
+	JR Z, .wait1
+;.wait2:
+;	IN A, (0x40)
+;	AND   0x10
+;	JR NZ, .wait2
 .end:
 	RET 
-; =============================================================================
-; == Fonction pour dessiner un sprite de 8x16 pixels à l'écran à partir de   ==
-; == l'adresse donnée par HL, le n° de sprite étant donné par IX.            ==
-; == En entrée : HL = adresse de l'écran où dessiner le sprite               ==
-; ==             IX = adresse du sprite dans la table de sprites             ==
-; =============================================================================
-draw_sprite_8x16:
-	LD B, 16           ; Nombre de lignes du sprite
-	LD DE, 31
-.loop:
-	LD A, (IX)         ; Lecture du premier octet du sprite
-	LD (HL), A         ; On l'affiche à l'écran
-	INC HL             ; On passe au pixel suivant
-	INC IX			   ; On passe au prochain octet du sprite
-	LD A, (IX)       ; Lecture du deuxième octet du sprite
-	LD (HL), A         ; On l'affiche à l'écran
-	ADD HL, DE         ; On passe à la ligne suivante de l'écran
-	INC IX             ; On passe au prochain octet du sprite
-	DJNZ .loop       ; On boucle jusqu'à afficher les 16 lignes du sprite
-	RET
+	include "sprite.asm"
 ; =============================================================================
 ; == Dessine un pilier à la 21 colonne                                       ==
 ; =============================================================================
@@ -272,99 +255,7 @@ loop_draw_column:
 	include "missiles.asm"
 	include "vaisseau.asm"
 	include "alien.asm"
-	; =============================================================================
-	; == Fonction qui initialise les variables du jeu pour une nouvelle partie   ==
-	; =============================================================================
-init_game:
-	LD A, 52
-	LD (vaisseau), A ; Vaisseau en état ok, x = 52
-	memset vaisseau+1, 12, 0 ; 6 missiles  désactivés
-	LD A, 0xE0
-	LD (vaisseau+13), A ; 3 bombes restantes, compteur explosion vaisseau = 0
-	LD A, 0xA3
-	LD (nb_vie_colon), A ; 3 vies, 10 colons
-	memset ennemis, 32, 0 ; 8 ennemis (inactifs)
-	LD A, 0
-	LD (score  ), A ; Score à 0
-	LD (score+1), A; Score à 0
-	RET
-	; ==============================================================================
-	; == Partie principale pour le jeu lui-même                                   ==
-	; ==============================================================================
-game:
-	CALL init_game 
-	LD A, 170
-	CALL cls
-	CALL draw_column
-	LD HL, SCORE_TXT
-	set_position_screen_3 25,1
-	CALL print
-	; Affichage des 10 colons
-	LD IX, sprites8x16
-	LD HL, (.pos_colons)
-	LD B, 5
-.loop1:
-	PUSH HL
-	PUSH IX
-	PUSH BC
-	CALL draw_sprite_8x16
-	POP BC
-	POP IX
-	POP HL
-	LD DE, 2
-	ADD HL, DE
-	DJNZ .loop1
-	LD HL, (.pos_colons+2)
-	LD B, 5
-.loop2:
-	PUSH HL
-	PUSH IX
-	PUSH BC
-	CALL draw_sprite_8x16
-	POP BC
-	POP IX
-	POP HL
-	LD DE, 2
-	ADD HL, DE
-	DJNZ .loop2
-	; Affichage des vies
-	LD B , 3 
-	LD HL, 175*128 + 22*4
-.loop3:
-	PUSH HL 
-	PUSH BC 
-	CALL draw_spaceship
-	POP BC 
-	POP HL
-	LD DE, 13
-	ADD HL, DE 
-	DJNZ .loop3
-	; Affichage des 3 bombes :
-	LD HL, 126*32 + 23 + SCREEN_ADDR
-	LD B , 3 
-.loop4:
-	LD IX, sprites8x16 + 32
-	PUSH HL 
-	PUSH BC 
-	CALL draw_sprite_8x16
-	POP BC 
-	POP HL 
-	LD DE, 2
-	ADD HL, DE 
-	DJNZ .loop4
-.game_loop:
-	CALL clear_ship
-	CALL clear_aliens
-
-	LD HL, 128*10 + 50 
-	LD A , 1 
-	CALL draw_alien
-	LD HL, 128*12 + 58 
-	LD A, 2
-	CALL draw_alien
-	RET
-.pos_colons:
-	dw SCREEN_ADDR + 22 + 32*70, SCREEN_ADDR + 22 + 32*90
+	include "game.asm"
 	; ==============================================================================
 	; == Ecran de présentation du jeu avec titre et menu de démarrage             ==
 	; ==============================================================================
@@ -390,24 +281,25 @@ presentation:
 	LD (HL), A
 	INC HL
 	DJNZ .horizontal_line
-	set_position_screen_3 6, 80
+	set_position_screen_3 6, 64
 	LD HL, start_txt
 	CALL print
+	CALL display_highscore
 .wait_for_space:
 	IN A, 131  ; Lecture du port 131 (clavier) où l'on attend l'appui sur la touche espace
 	BIT 7,A    ; Teste si la touche espace est pressée
 	JR NZ, .wait_for_space
-.wait_loop:
+.wait_loop:    ; Et on attend que la touche espace soit relachée !
 	IN A, 131 
 	BIT 7, A
 	JR Z, .wait_loop
 	CALL game
-	RET
+	JP presentation
 end_of_text:
 highscore:
-	db "ZX ", 0x00,0x51
-	db "PHC", 0x00,0x19
-	db "MSX", 0x00,0x02
+	db 'Z','X',' ', 0x51, 0x00
+	db 'P','H','C', 0x19, 0x00
+	db 'M','S','X', 0x02, 0x00
 ; Début des données fixes du jeu
 PREAMBLE:
 	db "Decompressing...", 0
@@ -425,19 +317,20 @@ compressed_sprites:
 	incbin "sprite16x16.zx0"
 compressed_fonte:
 	incbin "font.zx0"
-	BLOCK 440, 0xAA
+	BLOCK 443, 0xAA
 compressed_mask:
 	incbin "mask_sprite.zx0"
 fonte: EQU compressed_sprites
 mask:  EQU compressed_sprites + 760
 sprites16x16: EQU mask + 1282
+alien_sprite: EQU sprites16x16 + 256
 end_of_init:
 	define_uninit_begin end_of_init
 	define_uninit sprite, 1540
 ; ------------------- données sur le vaisseau du joueur -----------------------
 ; Premier octet : [S|x6|x5|x4|x3|x2|x1|x0] où S état du vaisseau (0 ok, 1 touché), 0 <= x <= 127
 ; octets 2-13   : 6*[A|y7|y6|y5|y4|y3|y2|y1][y0|x6|x5|x4|x3|x2|x1|x0] où A missile activé, 0<=y<=255, 0<=x<=127
-; octets 14     : Nombre bombes restantes : 3 bits, 1 bit bombe activée ou non, Compteur affichage explosion vaisseau (4 bits)
+; octets 14     : Nombre bombes restantes : 2 bits, 1 bit bombe activée ou non, Compteur affichage explosion vaisseau (5 bits)
 ; ----------------------------------------------$(DEPS)-------------------------------
 	define_uninit vaisseau, 14  ; 1 bit pour etat (0 ok, 1 en destruction); 7 bits pour x (y constant)
 ; [v4|v3|v2|v1|c4|c3|c2|c1]
@@ -447,9 +340,9 @@ end_of_init:
 ; Octet 1   : [E1|E0|C3|C2|C1|C0|T1|t0] : E état (00 : Inactif, 01 : actif, 11 : En explosion), C : compteur, T : Type (4 types possibles)
 ; Octet 2-3 : [0|0|0|y6|y5|y4|y3|y2][y1|y0|x5|x4|x3|x2|x1|x0]
 ; Octet 4   : utilisateur
-	define_uninit ennemis, 32
+	define_uninit ennemis, 4 * max_nb_aliens+4
 ; -----------------------------------------------------------------------------
-	define_uninit score, 2 
 	define_uninit frame_counter, 2 ; Compteur de frames pour le jeu
+	define_uninit score, 2 
 uninit_size equ uninit_pointer - end_of_init
 end
