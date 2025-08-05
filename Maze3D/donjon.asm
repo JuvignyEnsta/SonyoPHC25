@@ -1546,6 +1546,7 @@ affiche_etat_joueur:
     LD HL, .titre
     CALL print42
 .update_energie:
+    CALL wait_vsync
     LD HL, .energie
     CALL print42
     LD HL, .del_num
@@ -1573,6 +1574,7 @@ display:
     CALL print42
     JR .update_dir
 .update_pos:
+    CALL wait_vsync
     LD HL, printAt42Coords
     LD (HL), 4
     INC HL
@@ -1612,6 +1614,7 @@ display:
     CALL print42    
     RET
 .update_dir:
+    CALL wait_vsync
     LD HL, printAt42Coords
     LD (HL), 18
     INC HL

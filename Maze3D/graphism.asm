@@ -182,24 +182,50 @@ wait_vsync:
 .wait1:
 	IN A, (0x40)
 	AND   0x10
-;	JR Z, .end
-;	IN A, (0x40)
-;	AND   0x10
-	JR Z, .wait1
-;.wait2:
-;	IN A, (0x40)
-;	AND   0x10
-;	JR NZ, .wait2
+	JR NZ, .wait1
+.wait2:
+	IN A, (0x40)
+	AND   0x10
+	JR Z, .wait2
 .end:
 	RET 
 ;/===//////////////////////////////////////////////////////////////////////////////////////////////
 ;## Efface la fenêtre affichant le labyrinthe
 blit:
-    CALL wait_vsync
-    LD B, 120
-    XOR A
+    LD B, 40
 	LD HL, DoubleBuffering     ; Adresse mémoire du début du buffer
 	LD DE, SCREEN_ADDR         ; Adresse mémoire du début de l'écran
+    CALL wait_vsync
+.loop1:
+    PUSH BC
+	LD BC, 23          ; Largeur fenêtre en caractère
+    LDIR
+    PUSH HL
+    EX HL, DE
+    LD DE, 9
+    ADD HL, DE
+    EX HL, DE
+    POP HL
+    POP BC
+    DJNZ .loop1
+
+    LD B, 40
+    CALL wait_vsync
+.loop2:
+    PUSH BC
+	LD BC, 23          ; Largeur fenêtre en caractère
+    LDIR
+    PUSH HL
+    EX HL, DE
+    LD DE, 9
+    ADD HL, DE
+    EX HL, DE
+    POP HL
+    POP BC
+    DJNZ .loop2
+
+    LD B, 40
+    CALL wait_vsync
 .loop:
     PUSH BC
 	LD BC, 23          ; Largeur fenêtre en caractère

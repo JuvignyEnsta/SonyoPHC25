@@ -50,5 +50,5 @@ AT                EQU 22
 DEL               EQU 8
 ENDL              EQU 13
 ENDSTR            EQU 0
-
+FOOD_ENERG        EQU 12
     ENDIF

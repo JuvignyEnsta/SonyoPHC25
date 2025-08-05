@@ -104,12 +104,13 @@ start:
     CALL display.update_pos
     ; On vérifie si on n'est pas arrivé à la sortie :
     LD DE, (joueur_position)
-    LD A, 7
+    LD A, 255
     CP E
     JP NZ, .update
     LD A, 1
     CP D    
     JP NZ, .update
+.gagne:
     CALL cls
     LD HL, Gagne_msg
     CALL print42
@@ -133,7 +134,14 @@ start:
     CALL bouge_joueur
     CALL update_visited_rooms
     CALL display.update_pos
-    JR .update
+    LD DE, (joueur_position)
+    LD A, 255
+    CP E
+    JP NZ, .update
+    LD A, 1
+    CP D    
+    JP NZ, .update
+    JR .gagne
 .descend:
     IN A, 131
     BIT 2, A
@@ -157,12 +165,12 @@ start:
     LD (HL), A
     LD HL, joueur_energie
     LD A, (HL)
-    CP 53
+    CP 63 - FOOD_ENERG
     JR C, .rajoute
     LD (HL), 63
     JR .maj_energie
 .rajoute:
-    LD A, 10
+    LD A, FOOD_ENERG
     ADD (HL)
     LD (HL), A
 .maj_energie:
